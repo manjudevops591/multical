@@ -1,14 +1,15 @@
 node{
-    stage('SCM Checkout'){
-      git 'https://github.com/vijayakumar1/multical.git'
+  def mvnHome = tool name: 'mvn', type: 'maven'
+  def sonarscanner= tool name: 'sonarscanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+  stage('scm checkout'){
+    git 'https://github.com/manjudevops591/my-app.git'
+}
+  stage('Compile-package'){
+    sh "${mvnHome}/bin/mvn package"
+}
+  stage('SonarQube Analysis') {
+    withSonarQubeEnv('sonar-9') { 
+    sh "${sonarscanner}/bin/scanner sonar:sonar"
+        }
     }
-    stage('Compile-Package'){
-      def mvnHome = tool name: 'Maven', type: 'maven'
-      sh "${mvnHome}/bin/mvn package"
-    }
-    stage('Deploy-to-Tomcat'){
-       ws('/home/manju/.jenkins/workspace/mvn_file/target/'){
-       sh 'cp -r *.war /home/manju/Downloads/apache-tomcat-7.0.92/webapps'
-    }
-   }
- }
+}
